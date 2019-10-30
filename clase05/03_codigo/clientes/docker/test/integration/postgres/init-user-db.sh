@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
+    CREATE USER c7 PASSWORD 'c7';
+    CREATE DATABASE c7_clientes OWNER c7;
+    GRANT ALL PRIVILEGES ON DATABASE c7_clientes TO c7;
+
+
+    CREATE DATABASE c7_pedidos OWNER c7;
+    GRANT ALL PRIVILEGES ON DATABASE c7_pedidos TO c7;
+EOSQL

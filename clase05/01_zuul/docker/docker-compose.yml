@@ -1,0 +1,49 @@
+version: '3' 
+services:
+  gateway:
+    image: circulo7/curso-ms-gateway:0.0.1
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://registry:8761/eureka/
+    ports: 
+      - "9090:8080" 
+    depends_on:
+      - registry
+    restart: always
+  registry:
+    image: circulo7/curso-ms-registry:0.0.1
+    ports: 
+      - 8761:8761
+    restart: always
+  customerservice:
+    image: circulo7/curso-ms-customer-service:0.0.1
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/c7_data_customer
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://registry:8761/eureka/
+    # Dejar comentado, no se van a exponer al host
+    #ports:
+    #  - 8082:8080
+    #  - 8083:8081
+    depends_on:
+      - postgres
+      - rabbitmq
+      - registry
+    restart: always
+  postgres:
+    build: postgres
+    environment:
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    restart: always
+  rabbitmq:
+    image: rabbitmq:3.6.12-management-alpine
+    ports:
+      - 15672:15672
+    restart: always
+
+volumes:
+  postgres:
+    driver: local

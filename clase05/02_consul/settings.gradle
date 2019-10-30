@@ -1,0 +1,5 @@
+
+include 'customerService'
+include 'gateway'
+
+rootProject.name = 'consul'

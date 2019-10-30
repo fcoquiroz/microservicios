@@ -1,0 +1,104 @@
+version: '3.3' 
+services:
+  zipkin:
+    image: openzipkin/zipkin:2.11
+    ports:
+      - 9411:9411
+    restart: always
+  registry:
+    image: circulo7/curso-ms-registry:0.0.1
+    ports:
+      - 8761:8761
+    environment:
+      - SPRING_ZIPKIN_BASEURL=http://zipkin:9411/
+    restart: always
+  gateway:
+    image: circulo7/curso-ms-gateway:0.0.1
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://registry:8761/eureka/
+      - SPRING_ZIPKIN_BASEURL=http://zipkin:9411/
+    ports:
+      - 8765:8765
+    links:
+      - registry
+      - zipkin
+    restart: always
+  monitor:
+    image: circulo7/curso-ms-monitor:0.0.1
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://registry:8761/eureka/
+    ports: 
+      - 8030:8080
+    links:
+      - registry
+    restart: always
+  postgres:
+    build: clientes/docker/test/integration/postgres
+    environment:
+      - POSTGRES_PASSWORD=secret
+    ports:
+      - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    restart: always
+  clienteservice:
+    image: circulo7/curso-ms-clientes-service:0.0.1
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/c7_clientes
+      - SPRING_DATASOURCE_USERNAME=c7
+      - SPRING_DATASOURCE_PASSWORD=c7
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://registry:8761/eureka/
+      - SPRING_BOOT_ADMIN_URL=http://monitor:8080
+      - SPRING_ZIPKIN_BASEURL=http://zipkin:9411/
+    links:
+      - postgres
+      - registry
+      - zipkin
+      - monitor
+    #ports:
+    #- 8068:8080
+    restart: always
+  pedidoservice:
+    image: circulo7/curso-ms-pedidos-service:0.0.1
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/c7_pedidos
+      - SPRING_DATASOURCE_USERNAME=c7
+      - SPRING_DATASOURCE_PASSWORD=c7
+      - SPRING_ZIPKIN_BASEURL=http://zipkin:9411/
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://registry:8761/eureka/
+      - SPRING_BOOT_ADMIN_URL=http://monitor:8080
+      #- SPRING_JPA_SHOW_SQL=true
+    links:
+      - postgres
+      - registry
+      - zipkin
+      - monitor
+    #ports:
+    #- 8067:8080
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:v2.3.2
+    ports:
+    - 9090:9090
+    volumes:
+    - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+    - prom-data:/prometheus
+    command:
+    - --config.file=/etc/prometheus/prometheus.yml
+    restart: always
+  grafana:
+    image: grafana/grafana:5.2.2
+    ports:
+      - 3000:3000
+    depends_on:
+      - prometheus
+    links:
+      - prometheus
+    restart: always
+
+
+volumes:
+  db-data:
+  prom-data:
+

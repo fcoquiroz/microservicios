@@ -1,0 +1,37 @@
+server:
+  port: 8765
+
+info:
+  component: Edge Server
+
+zuul:
+  prefix: /v1
+  addHostHeader: true
+  routes:
+    clientes:
+      path: /clientes/**
+      serviceId: clientes
+    pedidos:
+      path: /pedidos/**
+      serviceId: pedidos
+
+ribbon:
+  eureka:
+    enabled: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    registerWithEureka: false
+
+spring:
+  application:
+    name: zuul
+
+management.security.enabled: false
+security.basic.enabled: false
+hystrix.command.default.execution.timeout.enabled: false
+
+management.endpoints.web.exposure.include: "*"
+

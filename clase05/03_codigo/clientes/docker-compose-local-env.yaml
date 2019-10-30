@@ -1,0 +1,22 @@
+version: '3.3'
+services:
+  postgres:
+    build: docker/test/integration/postgres
+    environment:
+      - POSTGRES_PASSWORD=secret
+    ports:
+      - 5432:5432
+    volumes:
+      - data-postgres:/var/lib/postgresql/data
+  clienteservice:
+    image: circulo7/curso-ms-clientes-service:0.0.1
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/c7_clientes
+      - SPRING_DATASOURCE_USERNAME=c7
+      - SPRING_DATASOURCE_PASSWORD=c7
+    links:
+      - postgres
+    ports:
+      - 8080:8080
+volumes:
+  data-postgres:

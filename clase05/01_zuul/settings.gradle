@@ -1,0 +1,6 @@
+
+include 'registry'
+include 'customerService'
+include 'gateway'
+
+rootProject.name = 'zuul'

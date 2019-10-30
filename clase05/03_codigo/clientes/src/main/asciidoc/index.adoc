@@ -1,0 +1,66 @@
+= Servicio de Clientes
+Circulo Siete
+Curso de Microservicios Cloud Native
+:toc-title: Tabla de contenidos
+:revnumber: {project-version}
+
+= Api de Clientes
+
+
+
+== Límite de crédito para los clientes
+
+Los clientes estan sujetos a un límite de crédito general. Este valor es a nivel sistema y se puede obtener su valor mediante un endpoint.
+
+
+.Solicitar el límite de crédito
+include::{snippets}/v1-cliente/limiteCredito/http-request.adoc[]
+
+.Valor obtenido
+include::{snippets}/v1-cliente/limiteCredito/http-response.adoc[]
+
+
+=== Ejemplo de uso
+
+Con `curl`:
+include::{snippets}/v1-cliente/limiteCredito/curl-request.adoc[]
+
+Tambien se puede usar `httpie`:
+include::{snippets}/v1-cliente/limiteCredito/httpie-request.adoc[]
+
+<<<
+== Crear clientes en el sistema
+
+Mediante el siguiente endpoint se pueden agregar clientes al sistema.
+
+Datos de entrada
+include::{snippets}/v1-cliente/create/request-fields.adoc[]
+
+Datos de respuesta
+include::{snippets}/v1-cliente/create/response-fields.adoc[]
+
+
+.Petición
+include::{snippets}/v1-cliente/create/http-request.adoc[]
+
+.Respuesta
+include::{snippets}/v1-cliente/create/http-response.adoc[]
+
+<<<
+=== Ejemplo de uso
+
+Con `curl`:
+include::{snippets}/v1-cliente/create/curl-request.adoc[]
+
+Tambien se puede usar `httpie`:
+include::{snippets}/v1-cliente/create/httpie-request.adoc[]
+
+<<<
+=== Errores
+
+Es posible obtener algunos errores al intentar crear Clientes, se documentan a continuación.
+
+==== Límite de crédito solicitado excede al máximo permitido.
+
+.Respuesta de error
+include::{snippets}/v1-cliente/createWithErrorExceedCreditLimit/http-response.adoc[]

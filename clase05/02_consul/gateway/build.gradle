@@ -1,0 +1,75 @@
+plugins {
+  id 'org.springframework.boot' version '2.1.3.RELEASE'
+  id 'com.bmuschko.docker-remote-api' version '4.6.2'
+  id 'java'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+sourceCompatibility = '1.8'
+
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+ext {
+  set('springCloudVersion', 'Greenwich.SR1')
+}
+
+bootJar {
+   archiveName = 'service.jar'
+   launchScript()
+}
+
+dependencies {
+  //implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+  implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
+  implementation 'org.springframework.cloud:spring-cloud-starter-netflix-zuul'
+  implementation 'org.codehaus.groovy:groovy-all:2.4.8'
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+  }
+}
+
+task createDockerfile(type: com.bmuschko.gradle.docker.tasks.image.Dockerfile) {
+  destFile = project.file('build/libs/Dockerfile')
+  from 'openjdk:8u181-jre-slim-stretch'
+  copyFile 'service.jar', '/opt/service.jar'
+  exposePort 8080
+  entryPoint 'java', "-Djava.awt.headless=true", "-Xms128m", "-Xmx128m", '-jar', '/opt/service.jar'
+}
+
+task buildImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage) {
+  dependsOn createDockerfile
+  inputDir = createDockerfile.destFile.get().asFile.parentFile
+    tags.add('circulo7/curso-ms-gateway-consul:' + project.version.toLowerCase())
+}
+
+task pushImage(type: com.bmuschko.gradle.docker.tasks.image.DockerPushImage) {
+  dependsOn buildImage
+  imageName = buildImage.tags.get().first()
+}
+
+docker {
+  registryCredentials {
+    url = (System.getenv('CONTAINER_REGISTRY_URL') ?: project.properties.getOrDefault('containerRegistryUrl', 'https://registry.hub.docker.io'))
+    username = (System.getenv('CONTAINER_BUILDER_USERNAME') ?: (project.hasProperty('containerRegistryUsername') ? containerRegistryUsername : '')) ?: ''
+    password = (System.getenv('CONTAINER_BUILDER_PASSWORD') ?: (project.hasProperty('containerRegistryPassword') ? containerRegistryPassword : '')) ?: ''
+  }
+}
+
+createDockerfile.dependsOn bootJar
+
+

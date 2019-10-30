@@ -1,0 +1,21 @@
+version: '2' 
+services:
+  app:
+    image: circulo7/curso-ms-mi-servicio:0.0.1
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://registry:8761/eureka/
+    ports: 
+      - 8080:8080
+    depends_on: 
+      - registry
+  app_demo:
+    image: circulo7/curso-ms-mi-servicio:0.0.1
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://registry:8761/eureka/
+    depends_on: 
+      - registry
+  registry:
+    image: circulo7/curso-ms-registry:0.0.1
+    ports:
+      - 8761:8761
+  

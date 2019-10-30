@@ -1,0 +1,2 @@
+ALTER TABLE clientes
+  ADD COLUMN pedidos_pendientes BIGINT NOT NULL DEFAULT 0;

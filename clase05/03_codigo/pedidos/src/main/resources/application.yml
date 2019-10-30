@@ -1,0 +1,33 @@
+server.port: 8080
+management.port: 8081
+
+instance.id: ${random.value}
+
+spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8761/eureka/
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
+    metadata-map:
+      instanceId: ${instance.id}
+
+ribbon:
+  eureka:
+    enabled: true
+
+management:
+  security:
+    enabled: false
+  endpoints.web.exposure.include: "*"
+security:
+  basic:
+    enabled: false
+
+hystrix.command.default.execution.timeout.enabled: false
+

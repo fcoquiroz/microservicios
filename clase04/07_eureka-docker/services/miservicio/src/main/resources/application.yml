@@ -1,0 +1,40 @@
+#Nombre de mi servicio, yo decido como nombrarlo
+spring.application.name: miservicio
+
+#Aqui se genera un valor random
+instance.id: ${random.value}
+
+management.security.enabled: false
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8761/eureka/
+  instance:
+    hostname: localhost
+    # Es preferible utilizar la direccion IP, 
+    # para evitar colisión de nombres de dominio
+    # o cuando no tenemos DNS bien configurado.
+    prefer-ip-address: true
+    #leaseRenewalIntervalInSeconds: 1
+    #leaseExpirationDurationInSeconds: 1
+    metadata-map:
+     instanceId: ${instance.id}
+
+# Esto es una seccion
+---
+spring:
+  profiles: devclient1
+server.port: 8083
+management.port: 8084
+---
+spring:
+  profiles: devclient2
+server.port: 8085
+management.port: 8086
+---
+spring:
+  profiles: devclient3
+server.port: 8087
+management.port: 8088
+

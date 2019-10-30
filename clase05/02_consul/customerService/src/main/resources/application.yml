@@ -1,0 +1,16 @@
+spring.cloud.consul.discovery.preferIpAddress: true
+spring.cloud.consul.discovery.instanceId: customer_${random.value}
+
+
+instance.id: ${random.value}
+
+server.port: 8080
+management.port: 8081
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/c7_data_customer
+    username: c7
+    password: c7
+
+management.security.enabled: false

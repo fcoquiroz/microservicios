@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  consul:
+    image: consul:1.5.3
+    ports:
+      - "8400:8400"
+      - "8500:8500"
+      - "8600:8600"
+      - "8600:8600/udp"
+
+  gateway:
+    image: circulo7/curso-ms-gateway-consul:0.0.1
+    environment:
+      - SPRING_CLOUD_CONSUL_HOST=consul
+    ports: 
+      - "9090:8080" 
+    restart: always
+  customerservice:
+    image: circulo7/curso-ms-customer-service-consul:0.0.1
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/c7_data_customer
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_CLOUD_CONSUL_HOST=consul
+    depends_on:
+      - postgres
+      - rabbitmq
+    restart: always
+  postgres:
+    build: postgres
+    environment:
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    restart: always
+  rabbitmq:
+    image: rabbitmq:3.6.12-management-alpine
+    ports:
+      - 15672:15672
+    restart: always
+
+volumes:
+  postgres:
+    driver: local

@@ -1,0 +1,4 @@
+ALTER TABLE clientes
+  ADD COLUMN created_at TIMESTAMP WITH TIME ZONE NULL     DEFAULT now();
+ALTER TABLE clientes
+  ADD COLUMN last_modified_at TIMESTAMP WITH TIME ZONE NULL     DEFAULT now();

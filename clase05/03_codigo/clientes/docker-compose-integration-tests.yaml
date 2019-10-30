@@ -1,0 +1,21 @@
+version: '3.3' 
+services:
+  postgres:
+    build: docker/test/integration/postgres
+    environment:
+      - POSTGRES_PASSWORD=secret
+  app:
+    build: docker/test/integration/app
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/c7_clientes
+      - SPRING_DATASOURCE_USERNAME=c7
+      - SPRING_DATASOURCE_PASSWORD=c7
+      - SPRING_JPA_SHOW_SQL=true
+      - PEDIDOS_VALIDATE=false
+    volumes:
+      # Monta en el contenedor el directorio actual para trabajar todo dentro de el.
+      - ./:/usr/src/app
+      # Montamos nuestro cache local de Gradle, para evitar descargar todo cada vez que construyamos
+      - ~/.gradle/:/root/.gradle
+    command: ./gradlew clean test jacocoTestReport asciidoctor --no-daemon --stacktrace
+    user: ${CURRENT_UID}
